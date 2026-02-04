@@ -28,29 +28,33 @@
       }
 
       .main-content {
-        max-width: 1200px; /* 网页显示的最大宽度 */
+        max-width: 1400px; /* 匹配看板原始宽度 */
         margin: 20px auto;
-        padding: 0 15px;
+        padding: 0 10px;
       }
 
-      /* 核心修复：这个容器负责切断溢出的 1400px 内容 */
       .viz-card {
         background: var(--card-bg);
         border-radius: 12px;
         box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
         position: relative;
-        width: 100%;
-        overflow: hidden; /* 必须是 hidden，防止 1400px 撑开网页 */
-        height: 800px; /* 初始高度 */
+        width: 100% !important; /* 强制锁定 */
+        overflow: hidden;
+        min-height: 400px;
       }
 
-      /* 缩放中心 */
+      /* 强制覆盖 Tableau 内部生成的宽度 */
       #vizContainer {
         position: absolute;
         left: 50%;
         top: 0;
         transform-origin: top center;
-        width: 1400px; /* 强制锁定 Tableau 原始宽度 */
+        width: 1400px !important;
+      }
+
+      /* 暴力解决：强制让内部所有对象不准撑开网页 */
+      .tableauViz {
+        width: 1400px !important;
       }
     </style>
   </head>
@@ -91,37 +95,40 @@
       var originalWidth = 1400;
       var originalHeight = 1627;
 
-      function resizeTableau() {
+      function doResize() {
         var card = document.getElementById("cardParent");
         var container = document.getElementById("vizContainer");
+        if (!card || !container) return;
 
-        // 1. 获取当前卡片的实际宽度
         var currentWidth = card.offsetWidth;
-
-        // 2. 计算缩放比例
         var scale = currentWidth / originalWidth;
         if (scale > 1) scale = 1;
 
-        // 3. 执行缩放和平移（translateX -50% 配合 left 50% 是居中神技）
+        // 应用缩放和平移
         container.style.transform = "translateX(-50%) scale(" + scale + ")";
 
-        // 4. 动态调整外层卡片高度，防止底部留白或切断
+        // 动态设置卡片高度
         card.style.height = originalHeight * scale + "px";
       }
 
-      // 监听窗口大小变化
-      window.addEventListener("resize", resizeTableau);
+      // 核心改动：不仅在加载和调整大小时执行，还要在 Tableau 加载期间“巡逻”
+      window.addEventListener("resize", doResize);
 
-      // 加载 Tableau 脚本
+      // 多次触发，对抗 Tableau 的内部样式重置
+      window.onload = function () {
+        doResize();
+        // 分别在 0.5秒、1.5秒、3秒后再次强制检查尺寸
+        [500, 1500, 3000].forEach((delay) => {
+          setTimeout(doResize, delay);
+        });
+      };
+
+      // 加载脚本
+      var vizDiv = document.getElementById("viz1770204389511");
       var scriptElement = document.createElement("script");
       scriptElement.src =
         "https://public.tableau.com/javascripts/api/viz_v1.js";
-      scriptElement.onload = function () {
-        // 脚本加载后多触发几次，确保 Tableau 渲染后尺寸正确
-        setTimeout(resizeTableau, 100);
-        setTimeout(resizeTableau, 1000);
-      };
-      document.getElementById("viz1770204389511").appendChild(scriptElement);
+      vizDiv.appendChild(scriptElement);
     </script>
   </body>
 </html>
