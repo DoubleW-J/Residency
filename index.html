@@ -144,60 +144,69 @@
     </div>
 
     <footer>
-      <p>&copy; 2026 PR Forecast Project.</p>
+      <p>&copy; 2025 PR Forecast Project.</p>
     </footer>
 
     <script type="text/javascript">
-      // ダッシュボードのオリジナル寸法（Viz Extensionsの描画余白を考慮）
+      // ダッシュボードの元サイズ定義
+      // ※ 追加グラフと拡張機能（Viz Extensions）の描画領域を考慮し、高さを2150pxに調整
       var originalWidth = 1400;
-      var originalHeight = 1750;
+      var originalHeight = 2150;
 
       /**
-       * ブラウザの幅に合わせてTableauダッシュボードをリサイズ・センタリングする
+       * 画面幅に応じたスケーリングおよび配置の補正処理
        */
       function resizeTableau() {
-        var card = document.getElementById('cardParent');
-        var container = document.getElementById('vizContainer');
-        var vizObj = container.getElementsByTagName('object')[0];
+        var card = document.getElementById("cardParent");
+        var container = document.getElementById("vizContainer");
+        var placeholder = document.getElementById("viz1770204389511");
+        var vizObj = placeholder.getElementsByTagName("object")[0];
 
         if (!card || !container || !vizObj) return;
 
-        // 1. 現在のカード幅を取得
+        // 親コンテナの幅を取得し、スケール比率を算出（最大1.0）
         var availableWidth = card.offsetWidth;
-
-        // 2. スケール比率を算出（最大1.0倍に制限）
         var scale = availableWidth / originalWidth;
         if (scale > 1) scale = 1;
 
-        // 3. 【重要】スケーリングの適用
+        // CSS Transformによるスケーリング適用
         container.style.transform = "scale(" + scale + ")";
 
-        // 4. 【センタリング補正】Negative Marginを使用して左右のズレを解消
-        // 幅の半分をマイナス方向にオフセットすることで、中心線を親要素の中央に固定
-        container.style.marginLeft = "-" + (originalWidth / 2) + "px";
+        // ネガティブマージンによる水平中央揃えの補正
+        container.style.marginLeft = "-" + originalWidth / 2 + "px";
 
-        // 5. カードコンテナの高さを動的に調整（縦方向の切れを防止）
-        card.style.height = (originalHeight * scale + 20) + "px';
+        // スケール後の高さに合わせて親カードの表示領域を動的に確保
+        card.style.height = originalHeight * scale + 60 + "px";
 
-        // 6. Tableau内部スタイルにオリジナルサイズを再適用
+        // Tableau側の描画不具合（白画面）防止のため、サイズと表示状態を明示的に指定
+        vizObj.style.display = "block";
         vizObj.style.width = originalWidth + "px";
         vizObj.style.height = originalHeight + "px";
+
+        // 内部に生成されるiframeに対してもサイズ整合性を強制
+        var iframe = placeholder.getElementsByTagName("iframe")[0];
+        if (iframe) {
+          iframe.style.display = "block";
+          iframe.style.width = originalWidth + "px";
+          iframe.style.height = originalHeight + "px";
+        }
       }
 
-      // ウィンドウサイズ変更時にイベントをトリガー
+      // ウィンドウリサイズ時に追従
       window.onresize = resizeTableau;
 
       /**
-       * Tableau公式ライブラリ読み込み後の初期化処理
+       * Tableau JS API のロードおよび初期化監視
        */
       var scriptElement = document.createElement("script");
-      scriptElement.src = "https://public.tableau.com/javascripts/api/viz_v1.js";
-      scriptElement.onload = function() {
-          // Tableauレンダリングのタイミング（特に拡張機能）に合わせ段階的にリサイズを実行
-          resizeTableau();
-          [500, 1500, 3000].forEach(function(delay) {
-              setTimeout(resizeTableau, delay);
-          });
+      scriptElement.src =
+        "https://public.tableau.com/javascripts/api/viz_v1.js";
+      scriptElement.onload = function () {
+        // 描画負荷を考慮し、初期ロードから数秒間ポーリング実行してレイアウトを確定させる
+        resizeTableau();
+        [500, 1500, 3000, 5000].forEach(function (delay) {
+          setTimeout(resizeTableau, delay);
+        });
       };
       document.getElementById("viz1770204389511").appendChild(scriptElement);
     </script>
