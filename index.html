@@ -20,7 +20,7 @@
         margin: 0;
         background-color: var(--bg-color);
         color: var(--primary-color);
-        overflow-x: hidden; /* スケール調整による横スクロールを防止 */
+        overflow-x: hidden;
       }
       .top-bar {
         height: 4px;
@@ -34,23 +34,23 @@
       }
 
       .main-content {
-        max-width: 1400px; /* テンプレートのオリジナル幅 */
+        max-width: 1400px; /* 模板原始宽度 */
         margin: 30px auto;
         padding: 0 10px;
       }
 
-      /* ダッシュボードを包むカード */
+      /* 核心修改：移除 flex，改为相对定位 */
       .viz-card {
         background: var(--card-bg);
         border-radius: 12px;
         box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
         position: relative;
         width: 100%;
-        overflow: visible; /* スケールされた内容の表示を許可 */
+        overflow: visible; /* 允许缩放内容溢出显示 */
         min-height: 500px;
       }
 
-      /* 縮尺調整用コンテナ：中央配置の設定 */
+      /* 缩放包装器：使用 absolute 配合 left 50% 实现完美居中 */
       #vizContainer {
         position: absolute;
         left: 50%;
@@ -131,46 +131,39 @@
     </footer>
 
     <script type="text/javascript">
-      // ダッシュボードの元サイズ
       var originalWidth = 1400;
       var originalHeight = 1627;
 
-      /**
-       * 画面サイズに合わせてTableauをリサイズする関数
-       */
       function resizeTableau() {
         var card = document.getElementById("cardParent");
         var container = document.getElementById("vizContainer");
         var vizObj = container.getElementsByTagName("object")[0];
 
-        if (!card || !container) return;
-
-        // 利用可能な幅を計算
+        // 计算可用宽度
         var availableWidth = card.offsetWidth;
         var scale = availableWidth / originalWidth;
 
         if (scale > 1) scale = 1;
 
-        // 縮尺と中央揃えを適用
+        // 应用缩放和居中平移
         container.style.width = originalWidth + "px";
         container.style.transform = "translateX(-50%) scale(" + scale + ")";
 
-        // カードの高さをスケーリングに合わせて動的に調整
+        // 动态调整卡片高度
         card.style.height = originalHeight * scale + 20 + "px";
 
         vizObj.style.width = originalWidth + "px";
         vizObj.style.height = originalHeight + "px";
       }
 
-      // ウィンドウサイズ変更時に実行
       window.onresize = resizeTableau;
 
-      // Tableau JS APIの読み込み
+      // 初始化加载
       var scriptElement = document.createElement("script");
       scriptElement.src =
         "https://public.tableau.com/javascripts/api/viz_v1.js";
       scriptElement.onload = function () {
-        // Tableauのレンダリング時間を考慮し、少し遅延させて実行
+        // 脚本加载后延迟一点点执行，确保DOM渲染完毕
         setTimeout(resizeTableau, 500);
       };
       document.getElementById("viz1770204389511").appendChild(scriptElement);
