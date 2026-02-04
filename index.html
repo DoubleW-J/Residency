@@ -15,23 +15,17 @@
         --bg-color: #f8f9fa;
         --card-bg: #ffffff;
       }
-
       body {
-        font-family:
-          "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans",
-          Meiryo, sans-serif;
+        font-family: "Helvetica Neue", Arial, sans-serif;
         margin: 0;
         background-color: var(--bg-color);
         color: var(--primary-color);
-        line-height: 1.6;
-        overflow-x: hidden; /* スケール調整による横スクロールを防止 */
+        overflow-x: hidden;
       }
-
       .top-bar {
         height: 4px;
         background: linear-gradient(to right, var(--accent-color), #2ecc71);
       }
-
       header {
         background-color: var(--card-bg);
         padding: 40px 20px;
@@ -39,53 +33,28 @@
         border-bottom: 1px solid #eee;
       }
 
-      header h1 {
-        margin: 0;
-        font-size: 2.2rem;
-        letter-spacing: 1px;
-      }
-
-      header p {
-        color: #7f8c8d;
-        margin-top: 10px;
-        font-weight: 300;
-      }
-
       .main-content {
-        max-width: 1400px;
+        max-width: 1400px; /* 模板原始宽度 */
         margin: 30px auto;
-        padding: 0 20px;
+        padding: 0 10px;
       }
 
-      .description-box {
-        margin-bottom: 30px;
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 20px;
-      }
-
-      .info-item {
-        background: #eef2f7;
-        padding: 15px 20px;
-        border-left: 4px solid var(--accent-color);
-        border-radius: 4px;
-        font-size: 0.9rem;
-      }
+      /* 核心修改：移除 flex，改为相对定位 */
       .viz-card {
         background: var(--card-bg);
         border-radius: 12px;
         box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
-        padding: 0px;
-        overflow: hidden;
-        display: flex;
-        justify-content: center;
         position: relative;
+        width: 100%;
+        overflow: visible; /* 允许缩放内容溢出显示 */
+        min-height: 500px;
       }
 
-      /* Tableauコンテナの縮放基準点を設定 */
+      /* 缩放包装器：使用 absolute 配合 left 50% 实现完美居中 */
       #vizContainer {
+        position: absolute;
+        left: 50%;
         transform-origin: top center;
-        transition: transform 0.3s ease;
       }
 
       footer {
@@ -95,16 +64,23 @@
         font-size: 0.85rem;
       }
 
-      @media (max-width: 768px) {
-        header h1 {
-          font-size: 1.6rem;
-        }
+      .description-box {
+        margin-bottom: 30px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+      }
+      .info-item {
+        background: #eef2f7;
+        padding: 15px 20px;
+        border-left: 4px solid var(--accent-color);
+        border-radius: 4px;
+        font-size: 0.9rem;
       }
     </style>
   </head>
   <body>
     <div class="top-bar"></div>
-
     <header>
       <h1>Permanent Residency Forecast</h1>
       <p>日本永住許可申請の動向予測・統計分析ポータル</p>
@@ -113,57 +89,35 @@
     <div class="main-content">
       <div class="description-box">
         <div class="info-item">
-          <strong>📊 データソース：</strong>
-          日本政府統計（e-Stat）の「出入国管理統計」に基づき、最新の公開データを自動反映。
+          <strong>📊 データソース：</strong>e-Stat「出入国管理統計」
         </div>
         <div class="info-item">
-          <strong>🔍 分析対象：</strong>
-          全国および各地方出入国在留管理局別の受理・許可・未済（バックログ）状況を網羅。
+          <strong>🔍 分析対象：</strong>全国および地方局別の受理・許可・未済状況
         </div>
         <div class="info-item">
-          <strong>📈 予測シミュレーション：</strong>
-          パラメータ変更により、過去のトレンドに基づいた今後の申請動向を予測可能。
+          <strong>📈 予測：</strong>トレンドに基づく今後の申請動向
         </div>
       </div>
 
-      <div class="viz-card">
-        <div class="tableauPlaceholder" id="vizContainer">
+      <div class="viz-card" id="cardParent">
+        <div id="vizContainer">
           <div
             class="tableauPlaceholder"
             id="viz1770204389511"
             style="position: relative"
           >
-            <noscript>
-              <a href="#">
-                <img
-                  alt="Designed by Pradeep Kumar"
-                  src="https://public.tableau.com/static/images/Su/SuperstoreDashboard-VizExtensionsEdition_VOTD_17702027410190/viz/1_rss.png"
-                  style="border: none"
-                />
-              </a>
-            </noscript>
             <object class="tableauViz" style="display: none">
               <param
                 name="host_url"
                 value="https%3A%2F%2Fpublic.tableau.com%2F"
               />
-              <param name="embed_code_version" value="3" />
-              <param name="site_root" value="" />
               <param
                 name="name"
                 value="SuperstoreDashboard-VizExtensionsEdition_VOTD_17702027410190&#47;viz"
               />
-              <param name="tabs" value="no" />
               <param name="toolbar" value="yes" />
-              <param
-                name="static_image"
-                value="https://public.tableau.com/static/images/Su/SuperstoreDashboard-VizExtensionsEdition_VOTD_17702027410190/viz/1.png"
-              />
               <param name="animate_transition" value="yes" />
               <param name="display_static_image" value="yes" />
-              <param name="display_spinner" value="yes" />
-              <param name="display_overlay" value="yes" />
-              <param name="display_count" value="yes" />
               <param name="language" value="zh-CN" />
               <param name="filter" value="publish=yes" />
             </object>
@@ -173,66 +127,46 @@
     </div>
 
     <footer>
-      <p>
-        &copy; 2026 PR Forecast Project. Data synced via Tableau Public API.
-      </p>
-      <p>
-        出入国管理統計のオープンデータを活用し、ビジュアライゼーションを行っています。
-      </p>
+      <p>&copy; 2026 PR Forecast Project.</p>
     </footer>
 
     <script type="text/javascript">
-      /**
-       * Tableauダッシュボードのサイズを調整する関数
-       */
+      var originalWidth = 1400;
+      var originalHeight = 1627;
+
       function resizeTableau() {
-        // .viz-cardの幅を取得（左右のパディングを考慮）
-        var vizCard = document.querySelector(".viz-card");
-        var containerWidth = vizCard.offsetWidth - 40;
+        var card = document.getElementById("cardParent");
+        var container = document.getElementById("vizContainer");
+        var vizObj = container.getElementsByTagName("object")[0];
 
-        var vizContainer = document.getElementById("vizContainer");
-        var divElement = document.getElementById("viz1770204389511");
-        var vizElement = divElement.getElementsByTagName("object")[0];
+        // 计算可用宽度
+        var availableWidth = card.offsetWidth;
+        var scale = availableWidth / originalWidth;
 
-        // テンプレートのオリジナルサイズ
-        var originalWidth = 1400;
-        var originalHeight = 1627;
-
-        // 【ここがポイント】
-        // 缩放比例：如果容器太窄，则进行缩小。
-        // 但如果容器足够宽，我们限制它不要缩得太小。
-        var scale = containerWidth / originalWidth;
-
-        // 限制：在PC端如果scale算出来是0.5（太小），我们可以稍微调大一点
-        // 或者确保容器本身在CSS里足够宽
         if (scale > 1) scale = 1;
 
-        // 全体をスケーリング
-        vizContainer.style.transform = "scale(" + scale + ")";
+        // 应用缩放和居中平移
+        container.style.width = originalWidth + "px";
+        container.style.transform = "translateX(-50%) scale(" + scale + ")";
 
-        // 【重要】スケーリング後の高さを親容器に反映
-        // これをしないと、下のフッターとの間に巨大な空白ができたり、中身が切れたりします
-        vizCard.style.height = originalHeight * scale + 60 + "px";
+        // 动态调整卡片高度
+        card.style.height = originalHeight * scale + 20 + "px";
 
-        // Tableauオブジェクトのサイズ設定
-        vizElement.style.width = originalWidth + "px";
-        vizElement.style.height = originalHeight + "px";
+        vizObj.style.width = originalWidth + "px";
+        vizObj.style.height = originalHeight + "px";
       }
 
-      // ウィンドウのリサイズ時に実行
       window.onresize = resizeTableau;
 
-      // 初期化
-      var divElement = document.getElementById("viz1770204389511");
-      var vizElement = divElement.getElementsByTagName("object")[0];
-
-      // 初回ロード時
-      resizeTableau();
-
+      // 初始化加载
       var scriptElement = document.createElement("script");
       scriptElement.src =
         "https://public.tableau.com/javascripts/api/viz_v1.js";
-      vizElement.parentNode.insertBefore(scriptElement, vizElement);
+      scriptElement.onload = function () {
+        // 脚本加载后延迟一点点执行，确保DOM渲染完毕
+        setTimeout(resizeTableau, 500);
+      };
+      document.getElementById("viz1770204389511").appendChild(scriptElement);
     </script>
   </body>
 </html>
