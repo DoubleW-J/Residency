@@ -16,16 +16,21 @@
         --card-bg: #ffffff;
       }
       body {
-        font-family: "Helvetica Neue", Arial, sans-serif;
+        font-family:
+          "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans",
+          Meiryo, sans-serif;
         margin: 0;
         background-color: var(--bg-color);
         color: var(--primary-color);
-        overflow-x: hidden;
+        line-height: 1.6;
+        overflow-x: hidden; /* 横スクロールを完全に防止 */
       }
+
       .top-bar {
         height: 4px;
         background: linear-gradient(to right, var(--accent-color), #2ecc71);
       }
+
       header {
         background-color: var(--card-bg);
         padding: 40px 20px;
@@ -33,28 +38,56 @@
         border-bottom: 1px solid #eee;
       }
 
-      .main-content {
-        max-width: 1400px; /* 模板原始宽度 */
-        margin: 30px auto;
-        padding: 0 10px;
+      header h1 {
+        margin: 0;
+        font-size: 2.2rem;
+        letter-spacing: 1px;
+      }
+      header p {
+        color: #7f8c8d;
+        margin-top: 10px;
+        font-weight: 300;
       }
 
-      /* 核心修改：移除 flex，改为相对定位 */
+      .main-content {
+        max-width: 1400px; /* ダッシュボードの元サイズに合わせる */
+        margin: 30px auto;
+        padding: 0 15px;
+      }
+
+      .description-box {
+        margin-bottom: 30px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+      }
+
+      .info-item {
+        background: #eef2f7;
+        padding: 15px 20px;
+        border-left: 4px solid var(--accent-color);
+        border-radius: 4px;
+        font-size: 0.9rem;
+      }
+
+      /* ダッシュボードを収めるカード：幅の切り取りを防止 */
       .viz-card {
         background: var(--card-bg);
         border-radius: 12px;
         box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+        padding: 0;
+        overflow: hidden; /* スケールされた要素の余分な領域を隠す */
         position: relative;
         width: 100%;
-        overflow: visible; /* 允许缩放内容溢出显示 */
-        min-height: 500px;
+        display: block; /* Flexを避け、計算の安定性を確保 */
       }
 
-      /* 缩放包装器：使用 absolute 配合 left 50% 实现完美居中 */
+      /* スケーリング用コンテナ：中央基準で縮小 */
       #vizContainer {
-        position: absolute;
-        left: 50%;
-        transform-origin: top center;
+        width: 1400px; /* オリジナル幅を強制 */
+        margin: 0 auto;
+        transform-origin: top center; /* 中央上部を軸に縮小 */
+        position: relative;
       }
 
       footer {
@@ -64,23 +97,16 @@
         font-size: 0.85rem;
       }
 
-      .description-box {
-        margin-bottom: 30px;
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 20px;
-      }
-      .info-item {
-        background: #eef2f7;
-        padding: 15px 20px;
-        border-left: 4px solid var(--accent-color);
-        border-radius: 4px;
-        font-size: 0.9rem;
+      @media (max-width: 768px) {
+        header h1 {
+          font-size: 1.6rem;
+        }
       }
     </style>
   </head>
   <body>
     <div class="top-bar"></div>
+
     <header>
       <h1>Permanent Residency Forecast</h1>
       <p>日本永住許可申請の動向予測・統計分析ポータル</p>
@@ -92,7 +118,7 @@
           <strong>📊 データソース：</strong>e-Stat「出入国管理統計」
         </div>
         <div class="info-item">
-          <strong>🔍 分析対象：</strong>全国および地方局別の受理・許可・未済状況
+          <strong>🔍 分析対象：</strong>全国および地方局別の申請・許可状況
         </div>
         <div class="info-item">
           <strong>📈 予測：</strong>トレンドに基づく今後の申請動向
@@ -131,40 +157,53 @@
     </footer>
 
     <script type="text/javascript">
+      // ダッシュボードのオリジナルサイズ（拡張機能を考慮し縦幅を微調整）
       var originalWidth = 1400;
-      var originalHeight = 1627;
+      var originalHeight = 1750;
 
+      /**
+       * Tableauのサイズとスケーリングを計算・適用する関数
+       */
       function resizeTableau() {
         var card = document.getElementById("cardParent");
         var container = document.getElementById("vizContainer");
         var vizObj = container.getElementsByTagName("object")[0];
 
-        // 计算可用宽度
-        var availableWidth = card.offsetWidth;
-        var scale = availableWidth / originalWidth;
+        if (!card || !container || !vizObj) return;
 
+        // 1. 親要素（カード）の幅を取得
+        var currentWidth = card.offsetWidth;
+
+        // 2. スケール比率を計算（最大1.0）
+        var scale = currentWidth / originalWidth;
         if (scale > 1) scale = 1;
 
-        // 应用缩放和居中平移
-        container.style.width = originalWidth + "px";
-        container.style.transform = "translateX(-50%) scale(" + scale + ")";
+        // 3. スケーリングを適用（transform-origin: top center により中央維持）
+        container.style.transform = "scale(" + scale + ")";
 
-        // 动态调整卡片高度
+        // 4. カードの高さをスケーリング後の高さに合わせる（重要：これで縦の切れを防止）
         card.style.height = originalHeight * scale + 20 + "px";
 
+        // 5. Tableau内部オブジェクトにサイズを強制
         vizObj.style.width = originalWidth + "px";
         vizObj.style.height = originalHeight + "px";
       }
 
+      // ウィンドウサイズ変更時に再計算を実行
       window.onresize = resizeTableau;
 
-      // 初始化加载
+      /**
+       * Tableau JS APIの読み込みと実行
+       */
       var scriptElement = document.createElement("script");
       scriptElement.src =
         "https://public.tableau.com/javascripts/api/viz_v1.js";
       scriptElement.onload = function () {
-        // 脚本加载后延迟一点点执行，确保DOM渲染完毕
-        setTimeout(resizeTableau, 500);
+        // Tableauの読み込み遅延やViz Extensionsの描画に合わせて段階的にリサイズを実行
+        resizeTableau();
+        [500, 1500, 3000, 5000].forEach(function (delay) {
+          setTimeout(resizeTableau, delay);
+        });
       };
       document.getElementById("viz1770204389511").appendChild(scriptElement);
     </script>
