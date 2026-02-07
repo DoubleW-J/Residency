@@ -25,6 +25,16 @@
         line-height: 1.6;
         overflow-x: hidden; /* モバイル端末での不要な横スクロールを防止 */
       }
+      a {
+        color: #333333;
+        text-decoration: none;
+        transition: 0.3s;
+      }
+
+      a:hover {
+        color: #86148b;
+        text-decoration: underline;
+      }
 
       .top-bar {
         height: 4px;
@@ -149,13 +159,44 @@
     </div>
 
     <footer>
-      <a href="https://github.com/DoubleW-J"
-        ><img
-          src="https://github.githubassets.com/images/modules/logos_page/Octocat.png"
-          alt="Octocat"
-          style="width: 24px; height: 24px"
-      /></a>
-      <p>Follow us on <a href="https://github.com/DoubleW-J">GitHub</a></p>
+      <div class="footer-container" style="text-align: center; padding: 20px">
+        <a
+          href="https://github.com/DoubleW-J/DoubleW-J.github.io"
+          target="_blank"
+          style="
+            text-decoration: none;
+            margin: 0 15px;
+            display: inline-flex;
+            align-items: center;
+            color: #333;
+          "
+        >
+          <img
+            src="https://img.icons8.com/color/48/github--v1.png"
+            alt="GitHub Logo"
+            style="width: 32px; height: 32px; margin-right: 8px"
+          />
+          <span style="font-weight: bold">Project Repo</span>
+        </a>
+
+        <a
+          href="mailto:jupiter.k.0223@gmail.com"
+          style="
+            text-decoration: none;
+            margin: 0 15px;
+            display: inline-flex;
+            align-items: center;
+            color: #333;
+          "
+        >
+          <img
+            src="https://img.icons8.com/color/48/filled-sent.png"
+            alt="Contact Me"
+            style="width: 32px; height: 32px; margin-right: 8px"
+          />
+          <span style="font-weight: bold">Contact Me</span>
+        </a>
+      </div>
       <p>&copy; 2025 PR Forecast Project.</p>
     </footer>
 
