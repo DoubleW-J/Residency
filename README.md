@@ -1,3 +1,5 @@
+
+https://doublew-j.github.io/
 # Permanent Residency Forecast System (Japan)
 日本における永住許可申請のトレンド予測と統計可視化システム
 
